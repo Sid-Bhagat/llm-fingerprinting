@@ -1,0 +1,114 @@
+{
+  "run_name": "cnn_output_s0_tr-general+math_te-general+math",
+  "model": "cnn",
+  "mode": "output",
+  "seed": 0,
+  "ablation": "none",
+  "train_domains": [
+    "general",
+    "math"
+  ],
+  "test_domains": [
+    "general",
+    "math"
+  ],
+  "epochs": 10,
+  "patience": 2,
+  "max_out_len": 256,
+  "batch_size": 64,
+  "lr": 0.001,
+  "train_frac": 1.0,
+  "log_every": 0,
+  "best_epoch": 4,
+  "best_val_macro_f1": 0.6936759506437716,
+  "history": [
+    {
+      "epoch": 1,
+      "train_loss": 1.4073610844374485,
+      "val_macro_f1": 0.5953194919896198,
+      "seconds": 4.9422502517700195
+    },
+    {
+      "epoch": 2,
+      "train_loss": 1.043630677338035,
+      "val_macro_f1": 0.6470068342903172,
+      "seconds": 4.90742564201355
+    },
+    {
+      "epoch": 3,
+      "train_loss": 0.9060481203690838,
+      "val_macro_f1": 0.6531356737609186,
+      "seconds": 4.80530047416687
+    },
+    {
+      "epoch": 4,
+      "train_loss": 0.807702525609968,
+      "val_macro_f1": 0.6936759506437716,
+      "seconds": 4.613476514816284
+    },
+    {
+      "epoch": 5,
+      "train_loss": 0.7405429839133869,
+      "val_macro_f1": 0.682879144096095,
+      "seconds": 4.934089183807373
+    },
+    {
+      "epoch": 6,
+      "train_loss": 0.6796792421656637,
+      "val_macro_f1": 0.6860064667982159,
+      "seconds": 4.916836977005005
+    }
+  ],
+  "n_train": 5498,
+  "n_val": 1245,
+  "n_test": 1249,
+  "test_source": "test_split",
+  "test_family_counts": {
+    "GPT": 310,
+    "Claude": 311,
+    "Llama": 310,
+    "PaLM": 318
+  },
+  "test": {
+    "accuracy": 0.6637309847878302,
+    "macro_f1": 0.6611608058373721,
+    "per_class_f1": {
+      "GPT": 0.4876190476190476,
+      "Claude": 0.8264984227129337,
+      "Llama": 0.5877659574468085,
+      "PaLM": 0.7427597955706985
+    },
+    "confusion_matrix": [
+      [
+        128,
+        31,
+        132,
+        19
+      ],
+      [
+        20,
+        262,
+        21,
+        8
+      ],
+      [
+        48,
+        17,
+        221,
+        24
+      ],
+      [
+        19,
+        13,
+        68,
+        218
+      ]
+    ]
+  },
+  "labels": [
+    "GPT",
+    "Claude",
+    "Llama",
+    "PaLM"
+  ]
+}
