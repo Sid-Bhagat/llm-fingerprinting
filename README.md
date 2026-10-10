@@ -39,7 +39,7 @@ bash scripts/run_rq3.sh
 #    + seed-0 confusion matrices in results/figures/
 python src/aggregate.py
 
-# 8. Report figures -> results/report_figs/ (rq1_rq2_bars, confusion_side_by_side, ablations,
+# 8. Report figures -> results/report_figs/ (rq1_rq2_bars, confusion_side_by_side, ablations, rq3_per_family,
 #    training_curves; 300 dpi PNG). Also prints the seed-averaged row-normalized confusion matrices
 #    (cnn output, lstm output patience 4) and trainable-parameter counts. Reads results/*.json only.
 python src/make_figures.py

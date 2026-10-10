@@ -34,11 +34,14 @@ plt.rcParams.update({
 })
 
 
-def load(model, mode, seed, ablation="none", patience=2, max_out_len=None):
-    """Load one full-data, all-domain run; None if its JSON is missing."""
+def load(model, mode, seed, ablation="none", patience=2, max_out_len=None, train_domains=ALL_DOMAINS,
+         test_domains=ALL_DOMAINS):
+    """Load one full-data run (name built like train.run_name); None if its JSON is missing."""
     name = f"{model}_{mode}_s{seed}"
     if ablation != "none":
         name += f"_{ablation}"
+    if train_domains != ALL_DOMAINS or test_domains != ALL_DOMAINS:
+        name += f"_tr-{'+'.join(train_domains)}_te-{'+'.join(test_domains)}"
     if max_out_len is not None and max_out_len != DEFAULT_OUT_LEN[mode]:
         name += f"_maxout{max_out_len}"
     if patience != 2:
@@ -51,7 +54,7 @@ def load(model, mode, seed, ablation="none", patience=2, max_out_len=None):
     # guard against the file name lying about the config
     assert r["model"] == model and r["mode"] == mode and r["seed"] == seed and r["ablation"] == ablation, path
     assert r.get("patience", 2) == patience and r.get("train_frac", 1.0) == 1.0, path
-    assert sorted(r["train_domains"]) == sorted(ALL_DOMAINS) == sorted(r["test_domains"]), path
+    assert r["train_domains"] == train_domains and r["test_domains"] == test_domains, path
     assert (r.get("max_out_len") or DEFAULT_OUT_LEN[mode]) == (max_out_len or DEFAULT_OUT_LEN[mode]), path
     assert r["labels"] == FAMILIES, path
     return r
@@ -222,6 +225,42 @@ def fig_training_curves():
     save(fig, "training_curves.png")
 
 
+def fig_rq3_per_family():
+    from matplotlib.patches import Patch
+    from matplotlib.lines import Line2D
+    seen, unseen = ["general", "math"], ["code"]
+    tests = [("Seen domains (general + math)", seen, None, 1.0), ("Unseen domain (code)", unseen, "///", 0.55)]
+    width = 0.38
+    fig, axes = plt.subplots(1, 2, figsize=(11, 4.6), sharey=True, constrained_layout=True)
+    for ax, model in zip(axes, ["cnn", "lstm"]):
+        patience = 4 if model == "lstm" else 2  # RQ3 used patience 4 for the lstm
+        macros = []
+        for k, (_, test_domains, hatch, alpha) in enumerate(tests):
+            runs = load_seeds(model, "output", patience=patience, train_domains=seen, test_domains=test_domains)
+            f1 = np.array([[r["test"]["per_class_f1"][f] for f in FAMILIES] for r in runs])
+            mean, std = f1.mean(axis=0), f1.std(axis=0, ddof=1)
+            macros.append(np.mean([r["test"]["macro_f1"] for r in runs]))
+            x = np.arange(len(FAMILIES)) + (k - 0.5) * width
+            ax.bar(x, mean, width * 0.92, yerr=std, capsize=3, color=[FAMILY_COLORS[f] for f in FAMILIES],
+                   alpha=alpha, hatch=hatch, edgecolor="white", linewidth=0, error_kw={"ecolor": INK, "lw": 1})
+            for xi, m, sd in zip(x, mean, std):
+                bar_label(ax, xi, m, sd)
+        ax.axhline(0.25, color=INK_2, linestyle="--", linewidth=1)
+        ax.set_xticks(range(len(FAMILIES)), FAMILIES)
+        ax.set_ylim(0, 1.0)
+        ax.set_title(f"{MODEL_NAMES[model]}" + (" (patience 4)" if patience == 4 else "")
+                     + f"\nmacro-F1: seen {macros[0]:.3f}, unseen {macros[1]:.3f}")
+        style_axis(ax)
+    axes[0].set_ylabel("Test F1 (mean ± std, 3 seeds)")
+    # neutral-gray proxies: hatch/opacity, not hue, encodes seen vs unseen; hue is the family
+    handles = [Patch(facecolor="#8a8985", alpha=alpha, hatch=hatch, edgecolor="white", label=label)
+               for label, _, hatch, alpha in tests]
+    handles.append(Line2D([], [], color=INK_2, linestyle="--", linewidth=1, label="chance (0.25)"))
+    fig.legend(handles=handles, loc="outside lower center", ncol=3, frameon=False)
+    fig.suptitle("RQ3: per-family F1, trained on general + math", fontsize=13)
+    save(fig, "rq3_per_family.png")
+
+
 def print_param_counts():
     with open(VOCAB_PATH) as f:
         vocab_size = len(json.load(f))
@@ -239,6 +278,7 @@ def main():
     fig_confusion()
     fig_ablations()
     fig_training_curves()
+    fig_rq3_per_family()
     print_param_counts()
 
 

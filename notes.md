@@ -67,6 +67,13 @@ Dropped (different base models): RWKV-4-Raven-14B, chatglm-6b, stablelm-tuned-al
 **BiLSTM:** emb 128 → 1-layer BiLSTM hidden 128 → max-pool over time → dropout 0.5 → linear(4)
 Padding is excluded from the max-pool in both models.
 
+**Trainable parameters** (vocab 30,000, 4 classes; from `src/make_figures.py`):
+| Model | Total | Embedding | Rest |
+|---|---|---|---|
+| TextCNN | 3,995,104 | 3,840,000 | 155,104 |
+| BiLSTM | 4,105,220 | 3,840,000 | 265,220 |
+The embedding is 96% (CNN) / 94% (BiLSTM) of the parameters, so the two models are almost the same size.
+
 **Training:** Adam lr 1e-3, batch 64, ≤10 epochs, early stopping on val macro-F1 (patience 2), best checkpoint evaluated on test, seeds 0/1/2.
 
 **Ablation implementation:** applied to the output text in every split. strip_markdown removes code fences, headers, bullets, `*`/`_`/backticks, repeated blank lines. truncate100 keeps the first 100 output tokens.
@@ -117,7 +124,27 @@ Seed 2 dipped at epoch 3 and patience 2 ended it. Without seed 2, mean is 0.679.
 - Seeds 1 and 2 both had a val dip that patience 2 treated as the end of training; with patience 4 both kept improving. The dips were noise, not overfitting.
 
 **CNN output seed-0 confusion (row-normalized recall):** Claude 0.83 · PaLM 0.74 · Llama 0.67 · GPT 0.52. GPT → Llama = 0.37 (largest error).
-[TODO: LSTM output confusion matrix; does it show the same GPT→Llama pattern?]
+
+**Averaged confusion matrices (output only, row-normalized, mean over seeds 0–2; figure: results/report_figs/confusion_side_by_side.png):**
+
+CNN (patience 2):
+| True \ Pred | GPT | Claude | Llama | PaLM |
+|---|---|---|---|---|
+| GPT | **0.575** | 0.056 | 0.312 | 0.056 |
+| Claude | 0.096 | **0.825** | 0.057 | 0.022 |
+| Llama | 0.227 | 0.055 | **0.620** | 0.098 |
+| PaLM | 0.088 | 0.030 | 0.161 | **0.721** |
+
+BiLSTM (patience 4):
+| True \ Pred | GPT | Claude | Llama | PaLM |
+|---|---|---|---|---|
+| GPT | **0.574** | 0.058 | 0.307 | 0.060 |
+| Claude | 0.119 | **0.801** | 0.058 | 0.021 |
+| Llama | 0.232 | 0.048 | **0.631** | 0.090 |
+| PaLM | 0.067 | 0.026 | 0.187 | **0.720** |
+
+- Yes, the BiLSTM shows the same GPT→Llama pattern: GPT→Llama 0.307 (CNN 0.312) is the largest error in both, and Llama→GPT (0.232 / 0.227) is second.
+- The two matrices agree to within 0.03 in every cell, so the two architectures make the same kinds of mistakes.
 
 **RQ1 takeaways:**
 - Both models ≈2.7× chance from the output alone.
@@ -193,12 +220,34 @@ Seed 2 dipped at epoch 3 and patience 2 ended it. Without seed 2, mean is 0.679.
 - Openings being 3-word phrases supports the RQ1 explanation that CNN filters (width 3–5) suit this task.
 - LSTM ablation comparisons are noisier because its patience-2 baseline includes the early-stopped seed.
 
-### RQ3: NEXT
+### RQ3: DONE
 
 **Design:** train on general + math, test on ALL code examples from all three splits (~290–320 per family, downsampled to equal counts); compare with an in-domain baseline (train and test on general + math). CNN at default patience; LSTM with patience 4 (patience 2 is shown to be unstable). Per-family F1.
 - train.py fix needed: when test domains don't overlap train domains, build the test set from all splits.
 - Vocab was built on all of train, including code prompts (no labels): minor caveat.
-- [TODO: results]
+
+**Test sets:** code (unseen) = 1,160 examples (290 per family, pooled from all splits, balanced, seed 42; identical across runs). general + math (seen) = 1,249 examples from the regular test split (domain-filtered, so not exactly balanced). Train 5,498 · val 1,245 (general + math only).
+
+**Results (output only, test F1, mean ± std over seeds 0–2; CNN patience 2, BiLSTM patience 4):**
+| Model | Test domain | Macro-F1 | GPT | Claude | Llama | PaLM |
+|---|---|---|---|---|---|---|
+| CNN | general + math (seen) | 0.689 ± 0.024 | 0.544 ± 0.051 | 0.850 ± 0.020 | 0.600 ± 0.023 | 0.763 ± 0.018 |
+| CNN | code (unseen) | 0.563 ± 0.016 | 0.507 ± 0.024 | 0.695 ± 0.023 | 0.413 ± 0.038 | 0.636 ± 0.015 |
+| BiLSTM | general + math (seen) | 0.667 ± 0.014 | 0.573 ± 0.012 | 0.833 ± 0.003 | 0.543 ± 0.036 | 0.717 ± 0.031 |
+| BiLSTM | code (unseen) | 0.528 ± 0.019 | 0.510 ± 0.027 | 0.659 ± 0.018 | 0.372 ± 0.007 | 0.571 ± 0.043 |
+
+**Drop from seen to unseen (F1):**
+| Model | Macro | GPT | Claude | Llama | PaLM |
+|---|---|---|---|---|---|
+| CNN | −0.126 | −0.036 | −0.154 | −0.187 | −0.127 |
+| BiLSTM | −0.138 | −0.063 | −0.174 | −0.171 | −0.145 |
+
+Figure: results/report_figs/rq3_per_family.png. Source: results/rq3_per_family.csv, results/summary.csv.
+
+- Both models stay well above chance (0.25) on code without ever training on it, but lose about 0.13 macro-F1.
+- Llama falls the most and GPT the least, in both models. Claude stays the easiest family on code.
+- The seen-domain baseline (0.689 CNN) matches the full-data output-only result (0.688), so dropping code from training doesn't hurt the seen domains.
+- [TODO: RQ3 interpretation]
 
 ## 5. Lessons Learned (raw notes; rewrite in my own voice)
 
