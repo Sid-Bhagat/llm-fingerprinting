@@ -27,6 +27,7 @@ MIN_FREQ, MAX_VOCAB = 2, 30000
 INPUT_LEN, OUTPUT_LEN, BOTH_INPUT_LEN, BOTH_OUTPUT_LEN = 64, 256, 64, 192
 DEFAULT_OUT_LEN = {"input": None, "output": OUTPUT_LEN, "both": BOTH_OUTPUT_LEN}  # input mode has no output
 DEFAULT_PATIENCE = 2
+TEST_POOL_SEED = 42  # balancing seed for the pooled cross-domain test set
 
 # newline, word, or single punctuation char; case is kept
 TOKEN_RE = re.compile(r"\n|\w+|[^\w\s]")
@@ -186,9 +187,21 @@ def main():
     stoi = {w: i for i, w in enumerate(itos)}
 
     # val follows the training domains (it drives early stopping); test uses the test domains
+    if set(a.test_domains) & set(a.train_domains):
+        test_source = "test_split"
+        splits["test"] = splits["test"][splits["test"]["domain"].isin(a.test_domains)]
+    else:
+        # disjoint domains: no test-domain example is trained or early-stopped on, so pool every split,
+        # then balance families (fixed seed so the test set is identical across runs)
+        test_source = "all_splits_balanced"
+        pool = pd.concat([splits[s] for s in ["train", "val", "test"]], ignore_index=True)
+        pool = pool[pool["domain"].isin(a.test_domains)]
+        n = pool["family"].value_counts().reindex(FAMILIES, fill_value=0).min()
+        splits["test"] = pool.groupby("family", group_keys=False).sample(n=n, random_state=TEST_POOL_SEED)
+    test_counts = splits["test"]["family"].value_counts().reindex(FAMILIES, fill_value=0).to_dict()
+    print(f"[{name}] test set: {test_source} ({'+'.join(a.test_domains)}) " + " ".join(f"{f}={c}" for f, c in test_counts.items()))
     splits["train"] = splits["train"][splits["train"]["domain"].isin(a.train_domains)]
     splits["val"] = splits["val"][splits["val"]["domain"].isin(a.train_domains)]
-    splits["test"] = splits["test"][splits["test"]["domain"].isin(a.test_domains)]
     if a.train_frac < 1:
         splits["train"] = splits["train"].sample(frac=a.train_frac, random_state=a.seed)
     data = {s: encode(apply_ablation(df, a.ablation), stoi, a.mode, a.ablation, a.max_out_len) for s, df in splits.items()}
@@ -232,6 +245,7 @@ def main():
         "run_name": name, **{k: v for k, v in vars(a).items() if k != "results_dir"},
         "best_epoch": best_epoch, "best_val_macro_f1": best_f1, "history": history,
         "n_train": len(data["train"][1]), "n_val": len(data["val"][1]), "n_test": len(data["test"][1]),
+        "test_source": test_source, "test_family_counts": test_counts,
         "test": test, "labels": FAMILIES,
     }
     path = os.path.join(a.results_dir, f"{name}.json")

@@ -28,8 +28,15 @@ python src/feature_lr.py
 #    --max_out_len 192 (cnn, RQ2 control), --patience 4 (lstm). DRY_RUN=1 prints commands only.
 bash scripts/run_rq4.sh
 
-# 6. results/summary.csv (mean ± std over seeds, grouped by model/mode/ablation/domains/
-#    max_out_len/patience) + seed-0 confusion matrices in results/figures/
+# 6. RQ3 runs (12, resumable): train on general+math, test on code (cross-domain) and on
+#    general+math (in-domain baseline); cnn, and lstm with --patience 4. When train and test
+#    domains are disjoint, the test set pools train+val+test for the test domains and balances
+#    families (seed 42). DRY_RUN=1 prints commands only.
+bash scripts/run_rq3.sh
+
+# 7. results/summary.csv (mean ± std over seeds, grouped by model/mode/ablation/domains/
+#    max_out_len/patience), results/rq3_per_family.csv (per-family F1 for domain-restricted runs)
+#    + seed-0 confusion matrices in results/figures/
 python src/aggregate.py
 
 # Smoke test (1 epoch, 20% of train; results kept out of results/)
