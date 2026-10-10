@@ -247,7 +247,11 @@ Figure: results/report_figs/rq3_per_family.png. Source: results/rq3_per_family.c
 - Both models stay well above chance (0.25) on code without ever training on it, but lose about 0.13 macro-F1.
 - Llama falls the most and GPT the least, in both models. Claude stays the easiest family on code.
 - The seen-domain baseline (0.689 CNN) matches the full-data output-only result (0.688), so dropping code from training doesn't hurt the seen domains.
-- [TODO: RQ3 interpretation]
+- Fingerprint partly generalizes: trained without code, both models still score more than twice chance on code (CNN 0.563, LSTM 0.528) but lose about 0.13 vs seen domains.
+- Llama drops most (CNN -0.19); possible reason: Llama fine-tunes learned coding style from ChatGPT outputs (untested). Claude and PaLM stay most identifiable on code. GPT barely drops but was already the hardest family.
+- Answer to iii: both a general fingerprint (above chance on an unseen domain) and task-specific patterns (the 0.13 drop).
+- Caveats: seen and unseen test sets come from different pools; shared vocab includes code tokens, whose embeddings were never trained on code examples; math too small to hold out.
+- Full write-up is in the report doc.
 
 ## 5. Lessons Learned (raw notes; rewrite in my own voice)
 
@@ -283,7 +287,9 @@ Figure: results/report_figs/rq3_per_family.png. Source: results/rq3_per_family.c
 - Box plots can hide a feature that's zero for most examples (bold collapsed to a flat line); switched to "share of outputs with any bold."
 - Correlated features (word vs char count) make individual logistic regression coefficients unreliable.
 - Deciding what counts as leakage: names are leakage; habitual phrases ("As an AI") are the fingerprint itself.
-- [TODO: add RQ3 lessons]
+- The default test split had only ~45 code examples per family, too few for a reliable cross-domain test. Pooling code from all splits was valid because no code example is used in training or early stopping in those runs, and it gave about 6x more test data.
+- Used patience 4 for the LSTM in RQ3 because RQ1 showed patience 2 was unstable: letting an earlier finding shape a later experiment, stated openly in the report.
+- Comparing scores across different test pools needs an explicit caveat even when the metric is the same.
 
 ---
 
