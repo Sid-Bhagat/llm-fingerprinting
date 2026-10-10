@@ -1,0 +1,13 @@
+feature,kruskal_H,description
+bold_rate,709.964961595644,**bold** spans per 100 words
+newline_rate,691.8258693539312,newlines per 100 words
+list_rate,617.561359897077,share of non-empty lines that are bullet or numbered items
+sentence_count,584.8426939806847,"sentences (split on .!? + whitespace, or newlines)"
+avg_sentence_len,524.8202722119008,words per sentence
+exclamation_rate,520.3541399194298,'!' per 100 words
+ttr_100,418.44788609209326,type-token ratio over the first 100 lowercased words
+word_count,319.8797972947127,words (\w+ tokens)
+char_count,293.43667274442157,characters
+code_block_rate,31.5135092020359,fenced code blocks per response
+question_rate,11.878472001804216,'?' per 100 words
+header_rate,3.175761282056539,share of non-empty lines that are markdown headers

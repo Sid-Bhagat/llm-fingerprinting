@@ -25,6 +25,8 @@ SPECIALS = ["<pad>", "<unk>", "<nl>", "<sep>"]
 UNK_ID, NL, SEP = 1, "<nl>", "<sep>"
 MIN_FREQ, MAX_VOCAB = 2, 30000
 INPUT_LEN, OUTPUT_LEN, BOTH_INPUT_LEN, BOTH_OUTPUT_LEN = 64, 256, 64, 192
+DEFAULT_OUT_LEN = {"input": None, "output": OUTPUT_LEN, "both": BOTH_OUTPUT_LEN}  # input mode has no output
+DEFAULT_PATIENCE = 2
 
 # newline, word, or single punctuation char; case is kept
 TOKEN_RE = re.compile(r"\n|\w+|[^\w\s]")
@@ -77,7 +79,7 @@ def apply_ablation(df, ablation):
     return df
 
 
-def encode(df, stoi, mode, ablation):
+def encode(df, stoi, mode, ablation, max_out_len):
     def ids(tokens, n):
         return [stoi.get(t, UNK_ID) for t in tokens[:n]]
 
@@ -88,9 +90,9 @@ def encode(df, stoi, mode, ablation):
         if mode == "input":
             s = ids(tokenize(inp), INPUT_LEN)
         elif mode == "output":
-            s = ids(out_tok, OUTPUT_LEN)
+            s = ids(out_tok, max_out_len)
         else:
-            s = ids(tokenize(inp), BOTH_INPUT_LEN) + [stoi[SEP]] + ids(out_tok, BOTH_OUTPUT_LEN)
+            s = ids(tokenize(inp), BOTH_INPUT_LEN) + [stoi[SEP]] + ids(out_tok, max_out_len)
         seqs.append(s or [UNK_ID])
     labels = [FAMILIES.index(f) for f in df["family"]]
     return seqs, labels
@@ -141,6 +143,10 @@ def run_name(a):
         name += f"_{a.ablation}"
     if a.train_domains != DOMAINS or a.test_domains != DOMAINS:
         name += f"_tr-{'+'.join(a.train_domains)}_te-{'+'.join(a.test_domains)}"
+    if a.max_out_len != DEFAULT_OUT_LEN[a.mode]:
+        name += f"_maxout{a.max_out_len}"
+    if a.patience != DEFAULT_PATIENCE:
+        name += f"_pat{a.patience}"
     if a.train_frac < 1:
         name += f"_frac{a.train_frac}"
     return name
@@ -155,13 +161,19 @@ def main():
     p.add_argument("--train_domains", nargs="+", choices=DOMAINS, default=DOMAINS)
     p.add_argument("--test_domains", nargs="+", choices=DOMAINS, default=DOMAINS)
     p.add_argument("--epochs", type=int, default=10)
-    p.add_argument("--patience", type=int, default=2)
+    p.add_argument("--patience", type=int, default=DEFAULT_PATIENCE)
+    p.add_argument("--max_out_len", type=int, default=None,
+                   help=f"output tokens kept (default {OUTPUT_LEN} in output mode, {BOTH_OUTPUT_LEN} in both mode)")
     p.add_argument("--batch_size", type=int, default=64)
     p.add_argument("--lr", type=float, default=1e-3)
     p.add_argument("--train_frac", type=float, default=1.0, help="subsample train (smoke tests)")
     p.add_argument("--log_every", type=int, default=0, help="print train loss every N batches (0 = off)")
     p.add_argument("--results_dir", default=os.path.join(ROOT, "results"))
     a = p.parse_args()
+    if a.max_out_len is None:
+        a.max_out_len = DEFAULT_OUT_LEN[a.mode]
+    elif a.mode == "input":
+        p.error("--max_out_len has no effect in input mode")
     a.train_domains, a.test_domains = sorted(a.train_domains, key=DOMAINS.index), sorted(a.test_domains, key=DOMAINS.index)
 
     set_seed(a.seed)
@@ -179,7 +191,7 @@ def main():
     splits["test"] = splits["test"][splits["test"]["domain"].isin(a.test_domains)]
     if a.train_frac < 1:
         splits["train"] = splits["train"].sample(frac=a.train_frac, random_state=a.seed)
-    data = {s: encode(apply_ablation(df, a.ablation), stoi, a.mode, a.ablation) for s, df in splits.items()}
+    data = {s: encode(apply_ablation(df, a.ablation), stoi, a.mode, a.ablation, a.max_out_len) for s, df in splits.items()}
     print(f"[{name}] device={device} vocab={len(itos)} " + " ".join(f"{s}={len(d[1])}" for s, d in data.items()))
 
     model = build_model(a.model, len(itos), len(FAMILIES)).to(device)

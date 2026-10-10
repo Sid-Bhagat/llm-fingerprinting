@@ -13,7 +13,8 @@ import pandas as pd
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 RESULTS_DIR = os.path.join(ROOT, "results")
 FIG_DIR = os.path.join(RESULTS_DIR, "figures")
-GROUP = ["model", "mode", "ablation", "train_domains", "test_domains"]
+GROUP = ["model", "mode", "ablation", "train_domains", "test_domains", "max_out_len", "patience"]
+DEFAULT_OUT_LEN = {"input": 0, "output": 256, "both": 192}  # mirrors train.py; 0 = no output (input mode)
 
 
 def load_runs():
@@ -31,6 +32,8 @@ def summarize(runs):
     df = pd.DataFrame([{
         "model": r["model"], "mode": r["mode"], "ablation": r["ablation"],
         "train_domains": "+".join(r["train_domains"]), "test_domains": "+".join(r["test_domains"]),
+        # older JSONs predate --max_out_len; input mode stores None
+        "max_out_len": r.get("max_out_len") or DEFAULT_OUT_LEN[r["mode"]], "patience": r.get("patience", 2),
         "seed": r["seed"], "accuracy": r["test"]["accuracy"], "macro_f1": r["test"]["macro_f1"],
     } for r in runs])
     g = df.groupby(GROUP, sort=True)
