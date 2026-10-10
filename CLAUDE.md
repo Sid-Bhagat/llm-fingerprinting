@@ -6,11 +6,11 @@ Classify which LLM family wrote a response. Course project with a 2-day deadline
 - Source: `lmsys/chatbot_arena_conversations` (Hugging Face, gated; read HF_TOKEN from env).
 - Each row has two models answering one prompt. Turn every row into two examples: (model_a, conversation_a) and (model_b, conversation_b).
 - Keep English, single-turn conversations only.
-- Family map: gpt-4 and gpt-3.5-turbo -> GPT; claude-v1 and claude-instant-v1 -> Claude; vicuna, koala, alpaca, llama-13b -> Llama; palm-2 -> PaLM. Drop all other models.
+- Family map: gpt-4, gpt-3.5-turbo -> GPT; claude-v1, claude-instant-v1 -> Claude; vicuna-13b, vicuna-7b, koala-13b, alpaca-13b, wizardlm-13b, gpt4all-13b-snoozy, guanaco-33b -> Llama; palm-2 -> PaLM. Drop all other models (including llama-13b).
 - Balance classes by downsampling every family to the size of the smallest one.
-- Scrub self-identifying text from outputs (mentions of Claude, Anthropic, OpenAI, ChatGPT, GPT-4, Vicuna, LMSYS, Google, PaLM, "language model trained by ..."). Log how many were removed.
+- Drop any response whose output mentions Claude, Anthropic, OpenAI, ChatGPT, GPT-4, GPT-3, Vicuna, LMSYS, Koala, Alpaca, PaLM, Bard, Google, or "trained by" (case-insensitive). Log how many were dropped per family.
 - Split 70/15/15 BY question_id, never by row, so one prompt can't land in two splits.
-- Domain label from prompt keywords: code fences or code keywords -> code; math words or mostly digits -> math; everything else -> general.
+- Domain label from prompt keywords: code fences or code keywords -> code; math words, arithmetic expressions (e.g. "2+2", dates excluded), "how many/much/long/old/far" with 2+ numbers, or mostly digits -> math; everything else -> general.
 - Save to `data/processed/{train,val,test}.parquet` with columns: question_id, model, family, input, output, domain.
 - Never modify `data/raw/`.
 
