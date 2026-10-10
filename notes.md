@@ -108,13 +108,13 @@ Seed 2 dipped at epoch 3 and patience 2 ended it. Without seed 2, mean is 0.679.
 | Seed | patience 2 | patience 4 |
 |---|---|---|
 | 0 | 0.664 | 0.664 (identical; best epoch already reached) |
-| 1 | 0.694 | 0.694 (identical; training is deterministic per seed) |
+| 1 | 0.694 | 0.693 (best epoch 10) |
 | 2 | 0.579 | **0.700** (best of all six LSTM runs) |
 | Mean | 0.646 ± 0.060 | **0.686 ± 0.019** |
 - With patience 4 the LSTM ties the CNN (0.688 ± 0.005). Same accuracy; the CNN is just more consistent and less sensitive to the stopping rule.
 - Patience 2 stays the main reported result (chosen before seeing results); patience 4 is reported as a sensitivity check.
 - The original seed-1 run and its patience-4 rerun had identical val curves (0.5338, 0.5661, ... 0.6873), which shows runs are reproducible.
-- Overfitting is visible after epoch 7: train loss 0.56 → 0.40 while val F1 0.687 → 0.644. Early stopping on val F1 protects the reported result.
+- Seeds 1 and 2 both had a val dip that patience 2 treated as the end of training; with patience 4 both kept improving. The dips were noise, not overfitting.
 
 **CNN output seed-0 confusion (row-normalized recall):** Claude 0.83 · PaLM 0.74 · Llama 0.67 · GPT 0.52. GPT → Llama = 0.37 (largest error).
 [TODO: LSTM output confusion matrix; does it show the same GPT→Llama pattern?]
