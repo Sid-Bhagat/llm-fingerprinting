@@ -1,0 +1,127 @@
+{
+  "run_name": "cnn_output_s2_truncate100",
+  "model": "cnn",
+  "mode": "output",
+  "seed": 2,
+  "ablation": "truncate100",
+  "train_domains": [
+    "general",
+    "code",
+    "math"
+  ],
+  "test_domains": [
+    "general",
+    "code",
+    "math"
+  ],
+  "epochs": 10,
+  "patience": 2,
+  "max_out_len": 256,
+  "batch_size": 64,
+  "lr": 0.001,
+  "train_frac": 1.0,
+  "log_every": 0,
+  "best_epoch": 7,
+  "best_val_macro_f1": 0.6480980702238768,
+  "history": [
+    {
+      "epoch": 1,
+      "train_loss": 1.3722154121947152,
+      "val_macro_f1": 0.5927745880986005,
+      "seconds": 2.8316776752471924
+    },
+    {
+      "epoch": 2,
+      "train_loss": 1.0837490517206005,
+      "val_macro_f1": 0.5711319491908802,
+      "seconds": 2.6970698833465576
+    },
+    {
+      "epoch": 3,
+      "train_loss": 0.9582387004859524,
+      "val_macro_f1": 0.6223295744442398,
+      "seconds": 2.6907436847686768
+    },
+    {
+      "epoch": 4,
+      "train_loss": 0.8788252077144832,
+      "val_macro_f1": 0.6044525234003,
+      "seconds": 2.6861119270324707
+    },
+    {
+      "epoch": 5,
+      "train_loss": 0.792072089540755,
+      "val_macro_f1": 0.6336264921205901,
+      "seconds": 2.726790428161621
+    },
+    {
+      "epoch": 6,
+      "train_loss": 0.7210355937970415,
+      "val_macro_f1": 0.6223594637595035,
+      "seconds": 3.6122660636901855
+    },
+    {
+      "epoch": 7,
+      "train_loss": 0.6436212027441905,
+      "val_macro_f1": 0.6480980702238768,
+      "seconds": 2.51649808883667
+    },
+    {
+      "epoch": 8,
+      "train_loss": 0.5722101789746794,
+      "val_macro_f1": 0.6442823977901424,
+      "seconds": 2.703763961791992
+    },
+    {
+      "epoch": 9,
+      "train_loss": 0.5097048641832584,
+      "val_macro_f1": 0.6479530420825641,
+      "seconds": 2.691094160079956
+    }
+  ],
+  "n_train": 6332,
+  "n_val": 1416,
+  "n_test": 1444,
+  "test": {
+    "accuracy": 0.6620498614958449,
+    "macro_f1": 0.6593236059780326,
+    "per_class_f1": {
+      "GPT": 0.5601092896174863,
+      "Claude": 0.8220338983050848,
+      "Llama": 0.5269461077844312,
+      "PaLM": 0.7282051282051282
+    },
+    "confusion_matrix": [
+      [
+        205,
+        27,
+        81,
+        48
+      ],
+      [
+        41,
+        291,
+        10,
+        19
+      ],
+      [
+        95,
+        22,
+        176,
+        68
+      ],
+      [
+        30,
+        7,
+        40,
+        284
+      ]
+    ]
+  },
+  "labels": [
+    "GPT",
+    "Claude",
+    "Llama",
+    "PaLM"
+  ]
+}

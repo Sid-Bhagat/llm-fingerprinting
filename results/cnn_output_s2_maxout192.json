@@ -1,0 +1,133 @@
+{
+  "run_name": "cnn_output_s2_maxout192",
+  "model": "cnn",
+  "mode": "output",
+  "seed": 2,
+  "ablation": "none",
+  "train_domains": [
+    "general",
+    "code",
+    "math"
+  ],
+  "test_domains": [
+    "general",
+    "code",
+    "math"
+  ],
+  "epochs": 10,
+  "patience": 2,
+  "max_out_len": 192,
+  "batch_size": 64,
+  "lr": 0.001,
+  "train_frac": 1.0,
+  "log_every": 0,
+  "best_epoch": 9,
+  "best_val_macro_f1": 0.6808594498746205,
+  "history": [
+    {
+      "epoch": 1,
+      "train_loss": 1.3874107817645625,
+      "val_macro_f1": 0.6103238972550679,
+      "seconds": 4.338298559188843
+    },
+    {
+      "epoch": 2,
+      "train_loss": 1.0738217294479726,
+      "val_macro_f1": 0.5920555621977973,
+      "seconds": 4.389754772186279
+    },
+    {
+      "epoch": 3,
+      "train_loss": 0.9505662787811558,
+      "val_macro_f1": 0.6416287623750359,
+      "seconds": 4.377635717391968
+    },
+    {
+      "epoch": 4,
+      "train_loss": 0.868923593230136,
+      "val_macro_f1": 0.6140875727588864,
+      "seconds": 4.399415016174316
+    },
+    {
+      "epoch": 5,
+      "train_loss": 0.7902323783611243,
+      "val_macro_f1": 0.6659834406619525,
+      "seconds": 5.692691326141357
+    },
+    {
+      "epoch": 6,
+      "train_loss": 0.7102121063899332,
+      "val_macro_f1": 0.663485284152626,
+      "seconds": 4.423189163208008
+    },
+    {
+      "epoch": 7,
+      "train_loss": 0.6424586775554408,
+      "val_macro_f1": 0.6709308176732227,
+      "seconds": 4.24609375
+    },
+    {
+      "epoch": 8,
+      "train_loss": 0.5792113330947095,
+      "val_macro_f1": 0.6613691058667097,
+      "seconds": 4.098052263259888
+    },
+    {
+      "epoch": 9,
+      "train_loss": 0.5296430526017691,
+      "val_macro_f1": 0.6808594498746205,
+      "seconds": 4.142262935638428
+    },
+    {
+      "epoch": 10,
+      "train_loss": 0.457906308538614,
+      "val_macro_f1": 0.6795959375460581,
+      "seconds": 4.2113049030303955
+    }
+  ],
+  "n_train": 6332,
+  "n_val": 1416,
+  "n_test": 1444,
+  "test": {
+    "accuracy": 0.6849030470914127,
+    "macro_f1": 0.6897691822842393,
+    "per_class_f1": {
+      "GPT": 0.5806451612903226,
+      "Claude": 0.8425531914893617,
+      "Llama": 0.5866336633663366,
+      "PaLM": 0.7492447129909365
+    },
+    "confusion_matrix": [
+      [
+        207,
+        21,
+        119,
+        14
+      ],
+      [
+        36,
+        297,
+        18,
+        10
+      ],
+      [
+        76,
+        19,
+        237,
+        29
+      ],
+      [
+        33,
+        7,
+        73,
+        248
+      ]
+    ]
+  },
+  "labels": [
+    "GPT",
+    "Claude",
+    "Llama",
+    "PaLM"
+  ]
+}
