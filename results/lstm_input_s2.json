@@ -1,0 +1,108 @@
+{
+  "run_name": "lstm_input_s2",
+  "model": "lstm",
+  "mode": "input",
+  "seed": 2,
+  "ablation": "none",
+  "train_domains": [
+    "general",
+    "code",
+    "math"
+  ],
+  "test_domains": [
+    "general",
+    "code",
+    "math"
+  ],
+  "epochs": 10,
+  "patience": 2,
+  "batch_size": 64,
+  "lr": 0.001,
+  "train_frac": 1.0,
+  "log_every": 0,
+  "best_epoch": 4,
+  "best_val_macro_f1": 0.2824184065750133,
+  "history": [
+    {
+      "epoch": 1,
+      "train_loss": 1.3967456168489825,
+      "val_macro_f1": 0.2292714971942214,
+      "seconds": 6.6780688762664795
+    },
+    {
+      "epoch": 2,
+      "train_loss": 1.3724845386500308,
+      "val_macro_f1": 0.23998739366950628,
+      "seconds": 6.4777185916900635
+    },
+    {
+      "epoch": 3,
+      "train_loss": 1.3485575705032444,
+      "val_macro_f1": 0.26325219211236695,
+      "seconds": 6.023515939712524
+    },
+    {
+      "epoch": 4,
+      "train_loss": 1.314141389243752,
+      "val_macro_f1": 0.2824184065750133,
+      "seconds": 6.308503150939941
+    },
+    {
+      "epoch": 5,
+      "train_loss": 1.2636606493707103,
+      "val_macro_f1": 0.2709856063520834,
+      "seconds": 6.011286735534668
+    },
+    {
+      "epoch": 6,
+      "train_loss": 1.1977643172950287,
+      "val_macro_f1": 0.2602993558966504,
+      "seconds": 6.585734844207764
+    }
+  ],
+  "n_train": 6332,
+  "n_val": 1416,
+  "n_test": 1444,
+  "test": {
+    "accuracy": 0.25761772853185594,
+    "macro_f1": 0.24547941819332683,
+    "per_class_f1": {
+      "GPT": 0.29655990510083036,
+      "Claude": 0.22255639097744362,
+      "Llama": 0.3071593533487298,
+      "PaLM": 0.1556420233463035
+    },
+    "confusion_matrix": [
+      [
+        125,
+        73,
+        119,
+        44
+      ],
+      [
+        129,
+        74,
+        126,
+        32
+      ],
+      [
+        122,
+        69,
+        133,
+        37
+      ],
+      [
+        106,
+        88,
+        127,
+        40
+      ]
+    ]
+  },
+  "labels": [
+    "GPT",
+    "Claude",
+    "Llama",
+    "PaLM"
+  ]
+}

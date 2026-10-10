@@ -1,0 +1,114 @@
+{
+  "run_name": "cnn_input_s1",
+  "model": "cnn",
+  "mode": "input",
+  "seed": 1,
+  "ablation": "none",
+  "train_domains": [
+    "general",
+    "code",
+    "math"
+  ],
+  "test_domains": [
+    "general",
+    "code",
+    "math"
+  ],
+  "epochs": 10,
+  "patience": 2,
+  "batch_size": 64,
+  "lr": 0.001,
+  "train_frac": 1.0,
+  "log_every": 0,
+  "best_epoch": 5,
+  "best_val_macro_f1": 0.2702146419179639,
+  "history": [
+    {
+      "epoch": 1,
+      "train_loss": 1.5313686142973861,
+      "val_macro_f1": 0.23281594349871004,
+      "seconds": 2.492548942565918
+    },
+    {
+      "epoch": 2,
+      "train_loss": 1.365209111667327,
+      "val_macro_f1": 0.1605745663727846,
+      "seconds": 2.5232930183410645
+    },
+    {
+      "epoch": 3,
+      "train_loss": 1.2987512588802201,
+      "val_macro_f1": 0.24434906456848612,
+      "seconds": 2.5612568855285645
+    },
+    {
+      "epoch": 4,
+      "train_loss": 1.2328471317369578,
+      "val_macro_f1": 0.2519807047244759,
+      "seconds": 2.4325671195983887
+    },
+    {
+      "epoch": 5,
+      "train_loss": 1.1719529331295233,
+      "val_macro_f1": 0.2702146419179639,
+      "seconds": 2.3249142169952393
+    },
+    {
+      "epoch": 6,
+      "train_loss": 1.1086736265346362,
+      "val_macro_f1": 0.26404924528599794,
+      "seconds": 2.078918218612671
+    },
+    {
+      "epoch": 7,
+      "train_loss": 1.0431219828106222,
+      "val_macro_f1": 0.23606482201442747,
+      "seconds": 2.062546730041504
+    }
+  ],
+  "n_train": 6332,
+  "n_val": 1416,
+  "n_test": 1444,
+  "test": {
+    "accuracy": 0.26385041551246535,
+    "macro_f1": 0.25252322398192556,
+    "per_class_f1": {
+      "GPT": 0.3330087633885102,
+      "Claude": 0.22405271828665568,
+      "Llama": 0.22530864197530864,
+      "PaLM": 0.22772277227722773
+    },
+    "confusion_matrix": [
+      [
+        171,
+        62,
+        72,
+        56
+      ],
+      [
+        168,
+        68,
+        66,
+        59
+      ],
+      [
+        171,
+        56,
+        73,
+        61
+      ],
+      [
+        156,
+        60,
+        76,
+        69
+      ]
+    ]
+  },
+  "labels": [
+    "GPT",
+    "Claude",
+    "Llama",
+    "PaLM"
+  ]
+}
