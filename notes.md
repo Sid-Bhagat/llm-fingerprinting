@@ -212,6 +212,7 @@ BiLSTM (patience 4):
 | First 192 tokens | 0.681 ± 0.010 | — |
 | Markdown stripped | 0.652 ± 0.018 | 0.650 ± 0.016 |
 | First 100 tokens | 0.640 ± 0.032 | 0.629 ± 0.007 |
+| First sentence dropped | 0.622 ± 0.021 | — |
 
 **RQ4 takeaways:**
 - Signals are both linguistic and structural, but mostly wording, especially openings and refusal phrases.
@@ -253,6 +254,38 @@ Figure: results/report_figs/rq3_per_family.png. Source: results/rq3_per_family.c
 - Caveats: seen and unseen test sets come from different pools; shared vocab includes code tokens, whose embeddings were never trained on code examples; math too small to hold out.
 - Full write-up is in the report doc.
 
+### Extras: DONE
+
+**TF-IDF + logistic regression baseline (src/tfidf_baseline.py, outputs only, 50k features, case kept, C tuned on val, best C = 10 for both; results/tfidf/):**
+- Test macro-F1: char 3-5 = 0.692, word 1-2 = 0.691, tied with CNN 0.688 and LSTM pat4 0.686.
+- Per-class F1, char 3-5: GPT 0.584 · Claude 0.833 · Llama 0.589 · PaLM 0.763
+- Per-class F1, word 1-2: GPT 0.601 · Claude 0.831 · Llama 0.571 · PaLM 0.762
+- Top char n-grams: GPT "\n- ", "As " · Claude " • ", "Here" · PaLM "\n* ", "**" · Llama code fences, " and ". Full top-10 lists in results/tfidf/top_ngrams.csv.
+
+**Bullet-character finding:**
+- 540/2,298 Claude outputs contain •; 2 or fewer for each other family.
+- strip_markdown left • in 37 Claude outputs (4 of 80 test) because the regex requires a space after the bullet. Kept as a caveat, not rerun.
+
+**Per-model error analysis (src/error_analysis.py; CNN output, patience 2, mean ± std over seeds 0–2; columns → = share predicted as that family; * = fewer than 30 test examples; results/error_analysis/per_model.csv, per_model_heatmap.png):**
+| Model | Family | n test | Correct | → GPT | → Claude | → Llama | → PaLM |
+|---|---|---|---|---|---|---|---|
+| gpt-4 | GPT | 177 | 65.9 ± 5.9% | 65.9% | 3.2% | 28.8% | 2.1% |
+| gpt-3.5-turbo | GPT | 184 | 49.5 ± 5.2% | 49.5% | 8.0% | 33.5% | 9.1% |
+| claude-v1 | Claude | 234 | 85.2 ± 1.3% | 7.7% | 85.2% | 5.0% | 2.1% |
+| claude-instant-v1 | Claude | 127 | 77.4 ± 3.2% | 13.1% | 77.4% | 7.1% | 2.4% |
+| vicuna-13b | Llama | 101 | 66.7 ± 6.3% | 20.1% | 6.9% | 66.7% | 6.3% |
+| vicuna-7b | Llama | 48 | 65.3 ± 7.3% | 20.8% | 1.4% | 65.3% | 12.5% |
+| koala-13b | Llama | 90 | 57.8 ± 4.8% | 24.8% | 4.1% | 57.8% | 13.3% |
+| alpaca-13b | Llama | 77 | 60.2 ± 6.1% | 23.8% | 9.5% | 60.2% | 6.5% |
+| wizardlm-13b * | Llama | 16 | 54.2 ± 21.9% | 31.2% | 2.1% | 54.2% | 12.5% |
+| gpt4all-13b-snoozy * | Llama | 14 | 66.7 ± 8.2% | 19.0% | 0.0% | 66.7% | 14.3% |
+| guanaco-33b * | Llama | 15 | 57.8 ± 10.2% | 22.2% | 6.7% | 57.8% | 13.3% |
+| palm-2 | PaLM | 361 | 72.1 ± 4.2% | 8.8% | 3.0% | 16.1% | 72.1% |
+
+- Vicuna not special (20-21% labeled GPT vs Koala/Alpaca 24-25%); GPT-3.5 is the hard case (49.5% correct vs GPT-4 65.9%; a third labeled Llama); Claude Instant harder than Claude v1 (77.4% vs 85.2%). LSTM shows the same pattern.
+
+**drop_first_sentence ablation (CNN output, seeds 0–2):** 0.622 ± 0.021 macro-F1, the largest single-ablation drop (-0.066).
+
 ## 5. Lessons Learned (raw notes; rewrite in my own voice)
 
 **Setup**
@@ -290,6 +323,11 @@ Figure: results/report_figs/rq3_per_family.png. Source: results/rq3_per_family.c
 - The default test split had only ~45 code examples per family, too few for a reliable cross-domain test. Pooling code from all splits was valid because no code example is used in training or early stopping in those runs, and it gave about 6x more test data.
 - Used patience 4 for the LSTM in RQ3 because RQ1 showed patience 2 was unstable: letting an earlier finding shape a later experiment, stated openly in the report.
 - Comparing scores across different test pools needs an explicit caveat even when the metric is the same.
+
+**Extras**
+- The error analysis refuted my specific Vicuna hypothesis but supported a broader version of it (GPT-3.5 imitation).
+- A simple TF-IDF baseline tied the neural models, which says the fingerprint is surface-level.
+- The strip_markdown regex gap was found through the TF-IDF top features.
 
 ---
 
