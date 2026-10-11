@@ -249,7 +249,7 @@ Figure: results/report_figs/rq3_per_family.png. Source: results/rq3_per_family.c
 - Llama falls the most and GPT the least, in both models. Claude stays the easiest family on code.
 - The seen-domain baseline (0.689 CNN) matches the full-data output-only result (0.688), so dropping code from training doesn't hurt the seen domains.
 - Fingerprint partly generalizes: trained without code, both models still score more than twice chance on code (CNN 0.563, LSTM 0.528) but lose about 0.13 vs seen domains.
-- Llama drops most (CNN -0.19); possible reason: Llama fine-tunes learned coding style from ChatGPT outputs (untested). Claude and PaLM stay most identifiable on code. GPT barely drops but was already the hardest family.
+- Llama drops most (CNN -0.19); possible reason: Llama fine-tunes learned coding style from ChatGPT outputs (untested). Claude and PaLM stay most identifiable on code. GPT barely drops (CNN -0.04, LSTM -0.06). GPT and Llama are the two hardest families and are confused with each other: in RQ3 in-domain, GPT is lowest for the CNN (0.544) but Llama is lowest for the LSTM (0.543); they're tied in RQ1 (CNN 0.578 vs 0.575, LSTM pat4 0.574 vs 0.578) and in TF-IDF (char 0.584 vs 0.589, word 0.601 vs 0.571).
 - Answer to iii: both a general fingerprint (above chance on an unseen domain) and task-specific patterns (the 0.13 drop).
 - Caveats: seen and unseen test sets come from different pools; shared vocab includes code tokens, whose embeddings were never trained on code examples; math too small to hold out.
 - Full write-up is in the report doc.
@@ -284,7 +284,7 @@ Figure: results/report_figs/rq3_per_family.png. Source: results/rq3_per_family.c
 
 - Vicuna not special (20-21% labeled GPT vs Koala/Alpaca 24-25%); GPT-3.5 is the hard case (49.5% correct vs GPT-4 65.9%; a third labeled Llama); Claude Instant harder than Claude v1 (77.4% vs 85.2%). LSTM shows the same pattern.
 
-**drop_first_sentence ablation (CNN output, seeds 0–2):** 0.622 ± 0.021 macro-F1, the largest single-ablation drop (-0.066).
+**drop_first_sentence ablation (CNN output, seeds 0–2):** 0.622 ± 0.021 macro-F1, the largest single-ablation drop (-0.066). It left 116 of 1,444 test outputs unchanged (26 with no boundary, 90 with nothing after the first sentence), so the -0.066 slightly understates the effect.
 
 ## 5. Lessons Learned (raw notes; rewrite in my own voice)
 

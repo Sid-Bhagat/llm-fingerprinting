@@ -49,7 +49,8 @@ python src/make_figures.py
 #    --save_preds -> results/preds/{run}.csv (question_id, model, family, domain, pred, correct). Their JSONs go
 #    to results/preds/runs/ (results/*.json untouched); src/verify_preds.py then checks each rerun's test
 #    metrics match results/{run}.json exactly. DRY_RUN=1 prints commands only.
-nohup bash scripts/run_preds.sh > preds.log 2>&1 &
+#    This one command runs both run_preds.sh and run_extra.sh (step 12), one after the other, into a single extras.log.
+nohup bash -c 'bash scripts/run_preds.sh && bash scripts/run_extra.sh' > extras.log 2>&1 &
 
 # 10. Per-underlying-model error analysis from the saved predictions -> results/error_analysis/
 #     (per_model.csv, per_model_heatmap.png; examples.md is gitignored because it contains dataset text)
@@ -62,7 +63,8 @@ python src/tfidf_baseline.py
 # 12. drop_first_sentence ablation (3 runs, resumable): cnn output, seeds 0-2. Removes the output up to and
 #     including the first . ! ? or newline; outputs with no boundary or nothing after it are kept as-is
 #     (counts are printed and stored under "ablation_stats" in the JSON). DRY_RUN=1 prints commands only.
-nohup bash scripts/run_extra.sh > extra.log 2>&1 &
+#     Already run by the step-9 command (log in extras.log); to run it alone:
+nohup bash scripts/run_extra.sh >> extras.log 2>&1 &
 #     then rerun step 7 (and 8) to include them in results/summary.csv
 
 # Smoke test (1 epoch, 20% of train; results kept out of results/)
