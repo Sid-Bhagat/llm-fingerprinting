@@ -18,7 +18,7 @@ VOCAB_PATH = os.path.join(ROOT, "data", "processed", "vocab.json")
 FAMILIES = ["GPT", "Claude", "Llama", "PaLM"]
 ALL_DOMAINS = ["general", "code", "math"]
 SEEDS = [0, 1, 2]
-DEFAULT_OUT_LEN = {"input": None, "output": 256, "both": 192}  # older JSONs store None
+DEFAULT_OUT_LEN = {"input": None, "output": 256, "both": 192}  # input-mode JSONs store None; grid JSONs predate the key
 
 # family colors match src/features.py; models use other slots so a hue always means one thing
 FAMILY_COLORS = dict(zip(FAMILIES, ["#2a78d6", "#eb6834", "#1baf7a", "#eda100"]))
@@ -262,8 +262,12 @@ def fig_rq3_per_family():
 
 
 def print_param_counts():
-    with open(VOCAB_PATH) as f:
-        vocab_size = len(json.load(f))
+    if os.path.exists(VOCAB_PATH):
+        with open(VOCAB_PATH) as f:
+            vocab_size = len(json.load(f))
+    else:
+        vocab_size = 30000  # train.MAX_VOCAB; the cap is hit (notes.md §2), so this matches vocab.json
+        print(f"\n{VOCAB_PATH} not found (run src/train.py once); using vocab size {vocab_size}")
     print(f"\nTrainable parameters (vocab size {vocab_size}, {len(FAMILIES)} classes):")
     for name in ["cnn", "lstm"]:
         model = build_model(name, vocab_size, len(FAMILIES))

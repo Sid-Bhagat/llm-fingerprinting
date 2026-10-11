@@ -1,6 +1,6 @@
 # Report Notes: LLM Fingerprinting
 
-Running notes for the final report. The report draft (sections 1–4) is in the Claude Doc; these notes hold the raw numbers and the Lessons Learned material. [TODO] = still waiting on results.
+Running notes for the final report. The report draft (sections 1–4) is in the Claude Doc; these notes hold the raw numbers and the Lessons Learned material.
 
 ---
 
@@ -12,7 +12,7 @@ Running notes for the final report. The report draft (sections 1–4) is in the 
 - 33,000 rows, 20 models. Each row has one user prompt answered by two randomly assigned models.
 - Access was granted on accepting the terms. Loaded with a read-only HF token in `.env` (gitignored).
 
-**Filtering pipeline (src/data.py):**
+**Filtering pipeline (src/data.py):** the counts in this section come from `src/data.py` console output on local data (not saved in results/; the final split and domain counts can be rechecked from data/processed).
 1. Single-turn English rows: 25,938 rows, 51,876 responses (25,928 unique question_ids, so a few repeat).
 2. Each row becomes two examples: (model, input = user turn, output = assistant turn).
 3. Map to families, drop other models, empty outputs, and exact duplicate (input, output) pairs.
@@ -79,7 +79,7 @@ The embedding is 96% (CNN) / 94% (BiLSTM) of the parameters, so the two models a
 **Ablation implementation:** applied to the output text in every split. strip_markdown removes code fences, headers, bullets, `*`/`_`/backticks, repeated blank lines. truncate100 keeps the first 100 output tokens.
 **Domain filtering:** val is filtered by --train_domains (it drives early stopping); test by --test_domains.
 
-**Smoke test (1 epoch, 20% of train, seed 0):**
+**Smoke test (1 epoch, 20% of train, seed 0; approximate, from console output, not in results/):**
 | Run | val macro-F1 | sec/epoch |
 |---|---|---|
 | cnn input | 0.209 | 0.7 |
@@ -89,7 +89,7 @@ The embedding is 96% (CNN) / 94% (BiLSTM) of the parameters, so the two models a
 | lstm output | ~0.35 (output cut off) | — |
 | lstm both | ~0.31 (output cut off) | — |
 
-**Runtime:** estimated ≤68 min for the full grid on CPU (16 threads); ran locally, no GPU needed. LSTM output/both took ~85% of the time. The first real CNN output run took ~52 s.
+**Runtime (approximate, not in results/):** estimated ≤68 min for the full grid on CPU (16 threads); ran locally, no GPU needed. LSTM output/both took ~85% of the time. The first real CNN output run took ~52 s.
 
 **Environment:** CPU torch 2.14.1, pandas 3.0.6, datasets 5.1.0; requirements pinned. CPU torch install: `pip install --index-url https://download.pytorch.org/whl/cpu torch==2.14.1`.
 
@@ -153,7 +153,7 @@ BiLSTM (patience 4):
 - GPT–Llama confusion matches the data: Llama fine-tunes imitate ChatGPT.
 
 **RQ2 takeaways:**
-- Input only ≈ chance for both models. Train loss fell 1.40 → 1.20 while val F1 stayed ~0.26: memorizing prompts without generalizing.
+- Input only ≈ chance for both models. LSTM input, seed 2: train loss fell 1.40 → 1.20 while val F1 stayed ~0.26: memorizing prompts without generalizing.
 - Why: Arena assigns models to prompts at random, so prompts are independent of the family. In datasets where users choose models per task, input-only could beat chance through selection bias, not a fingerprint.
 - Adding the input doesn't help (CNN 0.688 → 0.675; LSTM flat).
 - Confound: "both" mode shows only 192 output tokens vs 256. **Control DONE:** CNN output-only at 192 tokens = 0.681 ± 0.010. About half of the 0.013 drop comes from the shorter output; the remaining 0.006 attributed to the prompt is within seed noise. The prompt neither helps nor meaningfully hurts.
@@ -179,9 +179,9 @@ BiLSTM (patience 4):
 | '!' per 100 words | 0.271 | 0.365 | 0.252 | 0.200 |
 | '?' per 100 words | 0.286 | 0.224 | 0.282 | 0.206 |
 
-**Kruskal-Wallis H (how much a feature differs across families):** bold 710 · newline 692 · list 618 · sentence count 585 · avg sentence length 525 · TTR 418 · words 320 · chars 293 · code blocks 32 · '?' 12 · headers 3.2
+**Kruskal-Wallis H (how much a feature differs across families):** bold 710 · newline 692 · list 618 · sentence count 585 · avg sentence length 525 · '!' 520 · TTR 418 · words 320 · chars 293 · code blocks 32 · '?' 12 · headers 3.2
 
-**Box plot:** results/rq4/top4_features_boxplot.png (bold shown as share of outputs with any bold, since most outputs have none).
+**Box plot:** results/rq4/top4_features_boxplot.png (bold shown as share of outputs with any bold, since most outputs have none). The "share of outputs with any bold" row comes from `src/features.py` run on local data (the bar labels in that plot).
 
 **Family habits:**
 - Claude: longest, most list-heavy, shortest sentences.
@@ -202,7 +202,7 @@ BiLSTM (patience 4):
 **Feature-only logistic regression (src/feature_lr.py):**
 - Test macro-F1 0.435, accuracy 0.443 (C tuned on val; flat from 0.1 to 100).
 - Per-class F1: GPT 0.304 · Claude 0.508 · Llama 0.437 · PaLM 0.492 (GPT hardest again; 95/361 correct).
-- Top coefficients: GPT char_count, avg_sentence_len, sentence_count · Claude char_count, list_rate, ttr_100 · Llama avg_sentence_len, char_count · PaLM word_count, bold_rate, code_block_rate.
+- Top coefficients: GPT char_count, avg_sentence_len, sentence_count · Claude char_count, list_rate, ttr_100 · Llama avg_sentence_len, char_count, sentence_count · PaLM word_count, bold_rate, code_block_rate.
 - Caveat: word_count and char_count are nearly collinear, so their individual signs aren't meaningful. Bold for PaLM and lists for Claude match the descriptive stats and are the trustworthy ones.
 
 **Ablations (output only, macro-F1, 3 seeds, patience 2):**
@@ -262,7 +262,7 @@ Figure: results/report_figs/rq3_per_family.png. Source: results/rq3_per_family.c
 - Per-class F1, word 1-2: GPT 0.601 · Claude 0.831 · Llama 0.571 · PaLM 0.762
 - Top char n-grams: GPT "\n- ", "As " · Claude " • ", "Here" · PaLM "\n* ", "**" · Llama code fences, " and ". Full top-10 lists in results/tfidf/top_ngrams.csv.
 
-**Bullet-character finding:**
+**Bullet-character finding (counted on local data/processed; not saved in results/):**
 - 540/2,298 Claude outputs contain •; 2 or fewer for each other family.
 - strip_markdown left • in 37 Claude outputs (4 of 80 test) because the regex requires a space after the bullet. Kept as a caveat, not rerun.
 

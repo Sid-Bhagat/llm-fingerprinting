@@ -126,12 +126,15 @@ def main():
         print(table.drop(columns=["run"]).to_string(index=False))
 
     cnn_s0 = [d for d in preds["cnn"] if d["seed"].iloc[0] == 0]
-    if cnn_s0:
-        test = pd.read_parquet(os.path.join(DATA_DIR, "test.parquet"))
-        examples(cnn_s0[0], test, os.path.join(a.out_dir, "examples.md"))
-    else:
+    test_path = os.path.join(DATA_DIR, "test.parquet")
+    wrote_examples = bool(cnn_s0) and os.path.exists(test_path)
+    if wrote_examples:
+        examples(cnn_s0[0], pd.read_parquet(test_path), os.path.join(a.out_dir, "examples.md"))
+    elif not cnn_s0:
         print("cnn seed 0 predictions missing; examples.md not written")
-    print(f"wrote {a.out_dir}/per_model.csv, per_model_heatmap.png" + (", examples.md" if cnn_s0 else ""))
+    else:
+        print(f"{test_path} not found (run src/data.py); examples.md not written")
+    print(f"wrote {a.out_dir}/per_model.csv, per_model_heatmap.png" + (", examples.md" if wrote_examples else ""))
 
 
 if __name__ == "__main__":
