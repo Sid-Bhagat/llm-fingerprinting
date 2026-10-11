@@ -246,7 +246,7 @@ BiLSTM (patience 4):
 Figure: results/report_figs/rq3_per_family.png. Source: results/rq3_per_family.csv, results/summary.csv.
 
 - Both models stay well above chance (0.25) on code without ever training on it, but lose about 0.13 macro-F1.
-- Llama drops most for the CNN (-0.187); for the LSTM, Claude (-0.174) and Llama (-0.171) are tied. GPT drops least in both (CNN -0.036, LSTM -0.063). Llama ends lowest on code for both models (CNN 0.413, LSTM 0.372) because it started lower. Claude stays the easiest family on code.
+- Llama drops most for the CNN (-0.187); for the LSTM, Claude (-0.174) and Llama (-0.171) are tied. GPT drops least in both (CNN -0.036, LSTM -0.063). Llama ends lowest on code for both models (CNN 0.413, LSTM 0.372). For the CNN that's because Llama dropped the most (it started above GPT in-domain, 0.600 vs 0.544); for the LSTM it's because Llama started lowest. Claude stays the easiest family on code.
 - The seen-domain baseline (0.689 CNN) matches the full-data output-only result (0.688), so dropping code from training doesn't hurt the seen domains.
 - Fingerprint partly generalizes: trained without code, both models still score more than twice chance on code (CNN 0.563, LSTM 0.528) but lose about 0.13 vs seen domains.
 - Possible reason for Llama's drop: Llama fine-tunes learned coding style from ChatGPT outputs (untested). Claude and PaLM stay most identifiable on code. GPT barely drops (CNN -0.04, LSTM -0.06). GPT and Llama are the two hardest families and are confused with each other: in RQ3 in-domain, GPT is lowest for the CNN (0.544) but Llama is lowest for the LSTM (0.543); they're tied in RQ1 (CNN 0.578 vs 0.575, LSTM pat4 0.574 vs 0.578) and in TF-IDF (char 0.584 vs 0.589, word 0.601 vs 0.571).
