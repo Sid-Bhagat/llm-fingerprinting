@@ -1,0 +1,152 @@
+nohup: ignoring input
+[2026-10-10 19:37:55] start  cnn_output_s0
+[cnn_output_s0] test set: test_split (general+code+math) GPT=361 Claude=361 Llama=361 PaLM=361
+[cnn_output_s0] device=cpu vocab=30000 train=6332 val=1416 test=1444
+  epoch 1 train_loss 1.3905 val_macro_f1 0.5527 (5.0s)
+  epoch 2 train_loss 1.0511 val_macro_f1 0.6326 (4.7s)
+  epoch 3 train_loss 0.9289 val_macro_f1 0.6729 (4.8s)
+  epoch 4 train_loss 0.8300 val_macro_f1 0.6885 (4.5s)
+  epoch 5 train_loss 0.7638 val_macro_f1 0.6823 (4.8s)
+  epoch 6 train_loss 0.6916 val_macro_f1 0.6954 (4.9s)
+  epoch 7 train_loss 0.6473 val_macro_f1 0.7003 (4.5s)
+  epoch 8 train_loss 0.5725 val_macro_f1 0.6986 (4.9s)
+  epoch 9 train_loss 0.5227 val_macro_f1 0.6969 (5.9s)
+  early stop (best epoch 7)
+[cnn_output_s0] test acc 0.6898 macro_f1 0.6913 -> results/preds/runs/cnn_output_s0.json
+[cnn_output_s0] test predictions -> results/preds/cnn_output_s0.csv
+[2026-10-10 19:38:43] finish cnn_output_s0
+[2026-10-10 19:38:43] start  lstm_output_s0_pat4
+[lstm_output_s0_pat4] test set: test_split (general+code+math) GPT=361 Claude=361 Llama=361 PaLM=361
+[lstm_output_s0_pat4] device=cpu vocab=30000 train=6332 val=1416 test=1444
+  epoch 1 train_loss 1.3203 val_macro_f1 0.4889 (51.4s)
+  epoch 2 train_loss 1.0556 val_macro_f1 0.5994 (55.3s)
+  epoch 3 train_loss 0.8893 val_macro_f1 0.6260 (62.6s)
+  epoch 4 train_loss 0.8083 val_macro_f1 0.6526 (65.5s)
+  epoch 5 train_loss 0.7506 val_macro_f1 0.6535 (62.7s)
+  epoch 6 train_loss 0.6698 val_macro_f1 0.6627 (56.7s)
+  epoch 7 train_loss 0.5974 val_macro_f1 0.6590 (58.8s)
+  epoch 8 train_loss 0.5199 val_macro_f1 0.6705 (54.4s)
+  epoch 9 train_loss 0.4653 val_macro_f1 0.6609 (55.1s)
+  epoch 10 train_loss 0.4613 val_macro_f1 0.6430 (57.1s)
+[lstm_output_s0_pat4] test acc 0.6607 macro_f1 0.6644 -> results/preds/runs/lstm_output_s0_pat4.json
+[lstm_output_s0_pat4] test predictions -> results/preds/lstm_output_s0_pat4.csv
+[2026-10-10 19:48:28] finish lstm_output_s0_pat4
+[2026-10-10 19:48:28] start  cnn_output_s1
+[cnn_output_s1] test set: test_split (general+code+math) GPT=361 Claude=361 Llama=361 PaLM=361
+[cnn_output_s1] device=cpu vocab=30000 train=6332 val=1416 test=1444
+  epoch 1 train_loss 1.3869 val_macro_f1 0.5704 (6.1s)
+  epoch 2 train_loss 1.0664 val_macro_f1 0.6222 (6.0s)
+  epoch 3 train_loss 0.9413 val_macro_f1 0.6448 (5.3s)
+  epoch 4 train_loss 0.8412 val_macro_f1 0.6711 (5.9s)
+  epoch 5 train_loss 0.7673 val_macro_f1 0.6837 (5.8s)
+  epoch 6 train_loss 0.7131 val_macro_f1 0.6675 (5.5s)
+  epoch 7 train_loss 0.6306 val_macro_f1 0.6620 (5.4s)
+  early stop (best epoch 5)
+[cnn_output_s1] test acc 0.6780 macro_f1 0.6824 -> results/preds/runs/cnn_output_s1.json
+[cnn_output_s1] test predictions -> results/preds/cnn_output_s1.csv
+[2026-10-10 19:49:11] finish cnn_output_s1
+[2026-10-10 19:49:11] start  lstm_output_s1_pat4
+[lstm_output_s1_pat4] test set: test_split (general+code+math) GPT=361 Claude=361 Llama=361 PaLM=361
+[lstm_output_s1_pat4] device=cpu vocab=30000 train=6332 val=1416 test=1444
+  epoch 1 train_loss 1.3186 val_macro_f1 0.5338 (50.3s)
+  epoch 2 train_loss 1.0806 val_macro_f1 0.5661 (49.9s)
+  epoch 3 train_loss 0.9163 val_macro_f1 0.6096 (50.1s)
+  epoch 4 train_loss 0.7916 val_macro_f1 0.6467 (51.4s)
+  epoch 5 train_loss 0.7002 val_macro_f1 0.6686 (49.2s)
+  epoch 6 train_loss 0.6302 val_macro_f1 0.6863 (49.3s)
+  epoch 7 train_loss 0.5567 val_macro_f1 0.6873 (50.5s)
+  epoch 8 train_loss 0.4738 val_macro_f1 0.6803 (49.4s)
+  epoch 9 train_loss 0.4039 val_macro_f1 0.6444 (48.8s)
+  epoch 10 train_loss 0.3515 val_macro_f1 0.6956 (49.1s)
+[lstm_output_s1_pat4] test acc 0.6884 macro_f1 0.6928 -> results/preds/runs/lstm_output_s1_pat4.json
+[lstm_output_s1_pat4] test predictions -> results/preds/lstm_output_s1_pat4.csv
+[2026-10-10 19:57:34] finish lstm_output_s1_pat4
+[2026-10-10 19:57:34] start  cnn_output_s2
+[cnn_output_s2] test set: test_split (general+code+math) GPT=361 Claude=361 Llama=361 PaLM=361
+[cnn_output_s2] device=cpu vocab=30000 train=6332 val=1416 test=1444
+  epoch 1 train_loss 1.3911 val_macro_f1 0.6061 (5.6s)
+  epoch 2 train_loss 1.0609 val_macro_f1 0.5928 (5.7s)
+  epoch 3 train_loss 0.9338 val_macro_f1 0.6495 (5.8s)
+  epoch 4 train_loss 0.8441 val_macro_f1 0.6387 (5.2s)
+  epoch 5 train_loss 0.7637 val_macro_f1 0.6591 (5.2s)
+  epoch 6 train_loss 0.6985 val_macro_f1 0.6670 (5.7s)
+  epoch 7 train_loss 0.6251 val_macro_f1 0.6953 (5.2s)
+  epoch 8 train_loss 0.5662 val_macro_f1 0.6899 (5.6s)
+  epoch 9 train_loss 0.5118 val_macro_f1 0.6828 (5.6s)
+  early stop (best epoch 7)
+[cnn_output_s2] test acc 0.6877 macro_f1 0.6903 -> results/preds/runs/cnn_output_s2.json
+[cnn_output_s2] test predictions -> results/preds/cnn_output_s2.csv
+[2026-10-10 19:58:27] finish cnn_output_s2
+[2026-10-10 19:58:27] start  lstm_output_s2_pat4
+[lstm_output_s2_pat4] test set: test_split (general+code+math) GPT=361 Claude=361 Llama=361 PaLM=361
+[lstm_output_s2_pat4] device=cpu vocab=30000 train=6332 val=1416 test=1444
+  epoch 1 train_loss 1.3207 val_macro_f1 0.5335 (49.1s)
+  epoch 2 train_loss 1.0597 val_macro_f1 0.6038 (50.5s)
+  epoch 3 train_loss 0.8830 val_macro_f1 0.5842 (50.1s)
+  epoch 4 train_loss 0.7693 val_macro_f1 0.6013 (53.5s)
+  epoch 5 train_loss 0.6787 val_macro_f1 0.6486 (53.3s)
+  epoch 6 train_loss 0.6032 val_macro_f1 0.6626 (53.8s)
+  epoch 7 train_loss 0.5037 val_macro_f1 0.6555 (58.9s)
+  epoch 8 train_loss 0.4370 val_macro_f1 0.6652 (55.6s)
+  epoch 9 train_loss 0.3570 val_macro_f1 0.6505 (53.9s)
+  epoch 10 train_loss 0.3256 val_macro_f1 0.6423 (54.6s)
+[lstm_output_s2_pat4] test acc 0.6960 macro_f1 0.7002 -> results/preds/runs/lstm_output_s2_pat4.json
+[lstm_output_s2_pat4] test predictions -> results/preds/lstm_output_s2_pat4.csv
+[2026-10-10 20:07:25] finish lstm_output_s2_pat4
+OK       cnn_output_s0: acc 0.6898 macro_f1 0.6913 (best epoch 7) identical to /home/sid/llm-fingerprinting/results/cnn_output_s0.json
+OK       cnn_output_s1: acc 0.6780 macro_f1 0.6824 (best epoch 5) identical to /home/sid/llm-fingerprinting/results/cnn_output_s1.json
+OK       cnn_output_s2: acc 0.6877 macro_f1 0.6903 (best epoch 7) identical to /home/sid/llm-fingerprinting/results/cnn_output_s2.json
+OK       lstm_output_s0_pat4: acc 0.6607 macro_f1 0.6644 (best epoch 8) identical to /home/sid/llm-fingerprinting/results/lstm_output_s0_pat4.json
+OK       lstm_output_s1_pat4: acc 0.6884 macro_f1 0.6928 (best epoch 10) identical to /home/sid/llm-fingerprinting/results/lstm_output_s1_pat4.json
+OK       lstm_output_s2_pat4: acc 0.6960 macro_f1 0.7002 (best epoch 8) identical to /home/sid/llm-fingerprinting/results/lstm_output_s2_pat4.json
+6/6 runs match
+[2026-10-10 20:07:26] preds runs done
+[2026-10-10 20:07:27] start  cnn_output_s0_drop_first_sentence
+[cnn_output_s0_drop_first_sentence] test set: test_split (general+code+math) GPT=361 Claude=361 Llama=361 PaLM=361
+[cnn_output_s0_drop_first_sentence] drop_first_sentence train: dropped=5807 no_boundary=103 empty_rest=422 (unchanged = no_boundary + empty_rest, of 6332)
+[cnn_output_s0_drop_first_sentence] drop_first_sentence val: dropped=1295 no_boundary=20 empty_rest=101 (unchanged = no_boundary + empty_rest, of 1416)
+[cnn_output_s0_drop_first_sentence] drop_first_sentence test: dropped=1328 no_boundary=26 empty_rest=90 (unchanged = no_boundary + empty_rest, of 1444)
+[cnn_output_s0_drop_first_sentence] device=cpu vocab=30000 train=6332 val=1416 test=1444
+  epoch 1 train_loss 1.3946 val_macro_f1 0.5159 (6.3s)
+  epoch 2 train_loss 1.0862 val_macro_f1 0.5742 (5.9s)
+  epoch 3 train_loss 0.9631 val_macro_f1 0.6250 (5.7s)
+  epoch 4 train_loss 0.8792 val_macro_f1 0.6094 (5.7s)
+  epoch 5 train_loss 0.8154 val_macro_f1 0.6239 (6.4s)
+  early stop (best epoch 3)
+[cnn_output_s0_drop_first_sentence] test acc 0.5956 macro_f1 0.5990 -> /home/sid/llm-fingerprinting/results/cnn_output_s0_drop_first_sentence.json
+[2026-10-10 20:08:00] finish cnn_output_s0_drop_first_sentence
+[2026-10-10 20:08:00] start  cnn_output_s1_drop_first_sentence
+[cnn_output_s1_drop_first_sentence] test set: test_split (general+code+math) GPT=361 Claude=361 Llama=361 PaLM=361
+[cnn_output_s1_drop_first_sentence] drop_first_sentence train: dropped=5807 no_boundary=103 empty_rest=422 (unchanged = no_boundary + empty_rest, of 6332)
+[cnn_output_s1_drop_first_sentence] drop_first_sentence val: dropped=1295 no_boundary=20 empty_rest=101 (unchanged = no_boundary + empty_rest, of 1416)
+[cnn_output_s1_drop_first_sentence] drop_first_sentence test: dropped=1328 no_boundary=26 empty_rest=90 (unchanged = no_boundary + empty_rest, of 1444)
+[cnn_output_s1_drop_first_sentence] device=cpu vocab=30000 train=6332 val=1416 test=1444
+  epoch 1 train_loss 1.4023 val_macro_f1 0.5327 (6.1s)
+  epoch 2 train_loss 1.1042 val_macro_f1 0.5510 (6.1s)
+  epoch 3 train_loss 0.9839 val_macro_f1 0.5940 (5.7s)
+  epoch 4 train_loss 0.8959 val_macro_f1 0.6027 (5.6s)
+  epoch 5 train_loss 0.8196 val_macro_f1 0.6231 (5.5s)
+  epoch 6 train_loss 0.7435 val_macro_f1 0.6079 (6.0s)
+  epoch 7 train_loss 0.6732 val_macro_f1 0.5877 (5.9s)
+  early stop (best epoch 5)
+[cnn_output_s1_drop_first_sentence] test acc 0.6212 macro_f1 0.6289 -> /home/sid/llm-fingerprinting/results/cnn_output_s1_drop_first_sentence.json
+[2026-10-10 20:08:44] finish cnn_output_s1_drop_first_sentence
+[2026-10-10 20:08:44] start  cnn_output_s2_drop_first_sentence
+[cnn_output_s2_drop_first_sentence] test set: test_split (general+code+math) GPT=361 Claude=361 Llama=361 PaLM=361
+[cnn_output_s2_drop_first_sentence] drop_first_sentence train: dropped=5807 no_boundary=103 empty_rest=422 (unchanged = no_boundary + empty_rest, of 6332)
+[cnn_output_s2_drop_first_sentence] drop_first_sentence val: dropped=1295 no_boundary=20 empty_rest=101 (unchanged = no_boundary + empty_rest, of 1416)
+[cnn_output_s2_drop_first_sentence] drop_first_sentence test: dropped=1328 no_boundary=26 empty_rest=90 (unchanged = no_boundary + empty_rest, of 1444)
+[cnn_output_s2_drop_first_sentence] device=cpu vocab=30000 train=6332 val=1416 test=1444
+  epoch 1 train_loss 1.4149 val_macro_f1 0.5299 (5.9s)
+  epoch 2 train_loss 1.1046 val_macro_f1 0.5303 (5.7s)
+  epoch 3 train_loss 0.9826 val_macro_f1 0.6090 (5.3s)
+  epoch 4 train_loss 0.8952 val_macro_f1 0.6027 (5.7s)
+  epoch 5 train_loss 0.8200 val_macro_f1 0.6218 (5.7s)
+  epoch 6 train_loss 0.7444 val_macro_f1 0.6280 (5.6s)
+  epoch 7 train_loss 0.6682 val_macro_f1 0.6405 (5.8s)
+  epoch 8 train_loss 0.5922 val_macro_f1 0.6372 (5.9s)
+  epoch 9 train_loss 0.5432 val_macro_f1 0.6400 (5.9s)
+  early stop (best epoch 7)
+[cnn_output_s2_drop_first_sentence] test acc 0.6357 macro_f1 0.6394 -> /home/sid/llm-fingerprinting/results/cnn_output_s2_drop_first_sentence.json
+[2026-10-10 20:09:40] finish cnn_output_s2_drop_first_sentence
+[2026-10-10 20:09:40] extra runs done

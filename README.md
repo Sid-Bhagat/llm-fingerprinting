@@ -10,8 +10,9 @@ python src/data.py
 
 # 2. Train one model (the first run also builds the shared vocab at data/processed/vocab.json)
 #    --model cnn|lstm  --mode input|output|both  --seed N
-#    --ablation none|strip_markdown|truncate100  --train_domains ...  --test_domains ...
+#    --ablation none|strip_markdown|truncate100|drop_first_sentence  --train_domains ...  --test_domains ...
 #    --max_out_len N (default 256 output / 192 both)  --patience N (default 2)
+#    --save_preds [--preds_dir DIR] (test predictions CSV, default results/preds/)
 python src/train.py --model cnn --mode output --seed 0
 
 # 3. RQ1/RQ2 grid: {cnn,lstm} x {input,output,both} x seeds {0,1,2} (18 runs, resumable:
@@ -43,6 +44,26 @@ python src/aggregate.py
 #    training_curves; 300 dpi PNG). Also prints the seed-averaged row-normalized confusion matrices
 #    (cnn output, lstm output patience 4) and trainable-parameter counts. Reads results/*.json only.
 python src/make_figures.py
+
+# 9. Saved test predictions (6 reruns, resumable): cnn output and lstm output --patience 4, seeds 0-2, with
+#    --save_preds -> results/preds/{run}.csv (question_id, model, family, domain, pred, correct). Their JSONs go
+#    to results/preds/runs/ (results/*.json untouched); src/verify_preds.py then checks each rerun's test
+#    metrics match results/{run}.json exactly. DRY_RUN=1 prints commands only.
+nohup bash scripts/run_preds.sh > preds.log 2>&1 &
+
+# 10. Per-underlying-model error analysis from the saved predictions -> results/error_analysis/
+#     (per_model.csv, per_model_heatmap.png; examples.md is gitignored because it contains dataset text)
+python src/error_analysis.py
+
+# 11. TF-IDF + logistic regression on outputs (word 1-2 grams, char 3-5 grams; 50k features, case kept;
+#     C tuned on val) -> results/tfidf/ (word_1-2.json, char_3-5.json, summary.csv, top_ngrams.csv)
+python src/tfidf_baseline.py
+
+# 12. drop_first_sentence ablation (3 runs, resumable): cnn output, seeds 0-2. Removes the output up to and
+#     including the first . ! ? or newline; outputs with no boundary or nothing after it are kept as-is
+#     (counts are printed and stored under "ablation_stats" in the JSON). DRY_RUN=1 prints commands only.
+nohup bash scripts/run_extra.sh > extra.log 2>&1 &
+#     then rerun step 7 (and 8) to include them in results/summary.csv
 
 # Smoke test (1 epoch, 20% of train; results kept out of results/)
 for m in cnn lstm; do for mode in input output both; do

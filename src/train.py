@@ -63,6 +63,7 @@ MD_HEADER_RE = re.compile(r"^\s{0,3}#{1,6}\s+", re.MULTILINE)
 MD_BULLET_RE = re.compile(r"^\s*(?:[-*+•]|\d+[.)])\s+", re.MULTILINE)
 MD_EMPH_RE = re.compile(r"(\*\*|__|\*|`)")
 MULTI_NL_RE = re.compile(r"\n{2,}")
+SENT_BOUNDARY_RE = re.compile(r"[.!?\n]")
 
 
 def strip_markdown(text):
@@ -73,11 +74,28 @@ def strip_markdown(text):
     return MULTI_NL_RE.sub("\n", text)
 
 
+def drop_first_sentence(text):
+    """Drop everything up to and including the first . ! ? or newline (plus the whitespace after it).
+    Returns (text, status): status is "no_boundary" or "empty_rest" when the original is kept, else "dropped"."""
+    m = SENT_BOUNDARY_RE.search(text)
+    if m is None:
+        return text, "no_boundary"
+    rest = text[m.end():].lstrip()
+    return (rest, "dropped") if rest else (text, "empty_rest")
+
+
 def apply_ablation(df, ablation):
+    """Returns (df, stats); stats counts how drop_first_sentence treated each output (None otherwise)."""
     df = df.copy()
+    stats = None
     if ablation == "strip_markdown":
         df["output"] = df["output"].apply(strip_markdown)
-    return df
+    elif ablation == "drop_first_sentence":
+        out = df["output"].apply(drop_first_sentence)
+        df["output"] = [t for t, _ in out]
+        stats = Counter(st for _, st in out)
+        stats = {k: stats.get(k, 0) for k in ["dropped", "no_boundary", "empty_rest"]}
+    return df, stats
 
 
 def encode(df, stoi, mode, ablation, max_out_len):
@@ -158,7 +176,7 @@ def main():
     p.add_argument("--model", choices=["cnn", "lstm"], required=True)
     p.add_argument("--mode", choices=["input", "output", "both"], required=True)
     p.add_argument("--seed", type=int, default=0)
-    p.add_argument("--ablation", choices=["none", "strip_markdown", "truncate100"], default="none")
+    p.add_argument("--ablation", choices=["none", "strip_markdown", "truncate100", "drop_first_sentence"], default="none")
     p.add_argument("--train_domains", nargs="+", choices=DOMAINS, default=DOMAINS)
     p.add_argument("--test_domains", nargs="+", choices=DOMAINS, default=DOMAINS)
     p.add_argument("--epochs", type=int, default=10)
@@ -170,6 +188,8 @@ def main():
     p.add_argument("--train_frac", type=float, default=1.0, help="subsample train (smoke tests)")
     p.add_argument("--log_every", type=int, default=0, help="print train loss every N batches (0 = off)")
     p.add_argument("--results_dir", default=os.path.join(ROOT, "results"))
+    p.add_argument("--save_preds", action="store_true", help="write test predictions to <preds_dir>/{run_name}.csv")
+    p.add_argument("--preds_dir", default=os.path.join(ROOT, "results", "preds"))
     a = p.parse_args()
     if a.max_out_len is None:
         a.max_out_len = DEFAULT_OUT_LEN[a.mode]
@@ -179,6 +199,8 @@ def main():
 
     set_seed(a.seed)
     os.makedirs(a.results_dir, exist_ok=True)
+    if a.save_preds:
+        os.makedirs(a.preds_dir, exist_ok=True)
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     name = run_name(a)
 
@@ -204,7 +226,14 @@ def main():
     splits["val"] = splits["val"][splits["val"]["domain"].isin(a.train_domains)]
     if a.train_frac < 1:
         splits["train"] = splits["train"].sample(frac=a.train_frac, random_state=a.seed)
-    data = {s: encode(apply_ablation(df, a.ablation), stoi, a.mode, a.ablation, a.max_out_len) for s, df in splits.items()}
+    data, ablation_stats = {}, {}
+    for s, df in splits.items():
+        df, ablation_stats[s] = apply_ablation(df, a.ablation)
+        data[s] = encode(df, stoi, a.mode, a.ablation, a.max_out_len)
+    if a.ablation == "drop_first_sentence":
+        for s, st in ablation_stats.items():
+            print(f"[{name}] drop_first_sentence {s}: " + " ".join(f"{k}={v}" for k, v in st.items())
+                  + f" (unchanged = no_boundary + empty_rest, of {sum(st.values())})")
     print(f"[{name}] device={device} vocab={len(itos)} " + " ".join(f"{s}={len(d[1])}" for s, d in data.items()))
 
     model = build_model(a.model, len(itos), len(FAMILIES)).to(device)
@@ -240,18 +269,30 @@ def main():
                 break
 
     model.load_state_dict(best_state)
-    test = metrics(data["test"][1], predict(model, *data["test"], device, a.batch_size))
+    test_preds = predict(model, *data["test"], device, a.batch_size)
+    test = metrics(data["test"][1], test_preds)
     result = {
-        "run_name": name, **{k: v for k, v in vars(a).items() if k != "results_dir"},
+        "run_name": name, **{k: v for k, v in vars(a).items() if k not in ("results_dir", "preds_dir")},
         "best_epoch": best_epoch, "best_val_macro_f1": best_f1, "history": history,
         "n_train": len(data["train"][1]), "n_val": len(data["val"][1]), "n_test": len(data["test"][1]),
         "test_source": test_source, "test_family_counts": test_counts,
         "test": test, "labels": FAMILIES,
     }
+    if a.ablation == "drop_first_sentence":
+        result["ablation_stats"] = ablation_stats
     path = os.path.join(a.results_dir, f"{name}.json")
     with open(path, "w") as f:
         json.dump(result, f, indent=2)
     print(f"[{name}] test acc {test['accuracy']:.4f} macro_f1 {test['macro_f1']:.4f} -> {path}")
+    if a.save_preds:
+        t = splits["test"]
+        preds = pd.DataFrame({"question_id": t["question_id"].values, "model": t["model"].values,
+                              "family": t["family"].values, "domain": t["domain"].values,
+                              "pred": [FAMILIES[i] for i in test_preds]})
+        preds["correct"] = preds["family"] == preds["pred"]
+        ppath = os.path.join(a.preds_dir, f"{name}.csv")
+        preds.to_csv(ppath, index=False)
+        print(f"[{name}] test predictions -> {ppath}")
 
 
 if __name__ == "__main__":
