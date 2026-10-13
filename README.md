@@ -1,6 +1,7 @@
 # llm-fingerprinting
 Final report: [484Projectreport.pdf](484Projectreport.pdf)
 
+Contributors: Siddhant Bhagat (Solo)
 Classifies which LLM family (GPT, Claude, Llama, PaLM) wrote a chatbot response, using `lmsys/chatbot_arena_conversations`.
 Models: a TextCNN and a BiLSTM in PyTorch, trained on the prompt, the response, or both, with ablations, a cross-domain test, and TF-IDF / handcrafted-feature baselines.
 All runs were done on CPU; every number in the report comes from the files in `results/`.
